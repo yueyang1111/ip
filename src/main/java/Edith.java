@@ -2,9 +2,10 @@ import java.util.Scanner;
 
 public class Edith {
     private static final String LINE = "    ___________________________________";
+    public static final int MAX_TASKS = 100;
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[100];
+        Task[] tasks = new Task[MAX_TASKS];
         int taskCount = 0;
 
         printGreeting();
@@ -12,21 +13,36 @@ public class Edith {
 
         while (true) {
             String userInput = scanner.nextLine();
-            if (userInput.equals("bye")) {
+            String[] parts = userInput.split(" ", 2);
+            String commands = parts[0];
+
+            switch (commands) {
+            case "bye":
                 printExitMessage();
-                break;
-            } else if (userInput.equals("list")) {
+                scanner.close();
+                return;
+            case "list":
                 printTaskList(tasks, taskCount);
-            } else if (userInput.startsWith("mark ")) {
+                break;
+            case "mark":
                 markTask(tasks, userInput);
-            } else if (userInput.startsWith("unmark ")) {
+                break;
+            case "unmark":
                 unmarkTask(tasks, userInput);
-            } else {
-                addTask(tasks, taskCount, userInput);
-                taskCount++;
+                break;
+            case "todo":
+                tasks[taskCount++] = addTodo(parts[1], taskCount);
+                break;
+            case "event":
+                tasks[taskCount++] = addEvent(parts[1], taskCount);
+                break;
+            case "deadline":
+                tasks[taskCount++] = addDeadline(parts[1], taskCount);
+                break;
+            default:
+                System.out.println("    Invalid Command.");
             }
         }
-        scanner.close();
     }
 
     private static void printGreeting() {
@@ -46,17 +62,36 @@ public class Edith {
         System.out.println(LINE);
         System.out.println("    Here are the tasks in your list:");
         for (int i = 0; i < taskCount; i++) {
-            Task task = tasks[i];
-            System.out.println("    " + (i + 1) + ".[" + task.getStatusIcon()
-                    + "] " + task.getDescription());
+            System.out.println("    " + (i + 1) + "." + tasks[i]);
         }
         System.out.println(LINE);
     }
 
-    private static void addTask(Task[] tasks, int taskCount, String userInput) {
+    private static Task addTodo(String userInput, int taskCount) {
+        Task task = new Todo(userInput);
+        printAddMessage(task, taskCount);
+        return task;
+    }
+
+    private static Task addEvent(String userInput, int taskCount) {
+        String[] parts = userInput.split(" /from | /to ");
+        Task task = new Event(parts[0], parts[1], parts[2]);
+        printAddMessage(task, taskCount);
+        return task;
+    }
+
+    private static Task addDeadline(String userInput, int taskCount) {
+        String[] parts = userInput.split(" /by ");
+        Task task = new Deadline(parts[0], parts[1]);
+        printAddMessage(task, taskCount);
+        return task;
+    }
+
+    private static void printAddMessage(Task task, int taskCount) {
         System.out.println(LINE);
-        tasks[taskCount] = new Task(userInput);
-        System.out.println("    added: " + userInput);
+        System.out.println("    Got it. I've added this task:");
+        System.out.println("    " + task);
+        System.out.println("    Now you have " + taskCount + " tasks in the list");
         System.out.println(LINE);
     }
 
@@ -66,7 +101,7 @@ public class Edith {
         Task task = tasks[index];
         task.markAsDone();
         System.out.println("    Nice! I've marked this task as done:");
-        System.out.println("    [X] " + task.getDescription());
+        System.out.println("    " + task);
         System.out.println(LINE);
     }
 
@@ -76,7 +111,7 @@ public class Edith {
         Task task = tasks[index];
         task.markAsNotDone();
         System.out.println("    OK, I've marked this task as not done yet:");
-        System.out.println("    [ ] " + task.getDescription());
+        System.out.println("    " + task);
         System.out.println(LINE);
     }
 }
