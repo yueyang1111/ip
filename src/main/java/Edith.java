@@ -1,8 +1,9 @@
 import java.util.Scanner;
 
 public class Edith {
+    private static final int TASK_INDEX_OFFSET = 1;
     private static final String LINE = "    ___________________________________";
-    public static final int MAX_TASKS = 100;
+    private static final int MAX_TASKS = 100;
 
     public static void main(String[] args) {
         Task[] tasks = new Task[MAX_TASKS];
@@ -14,9 +15,9 @@ public class Edith {
         while (true) {
             String userInput = scanner.nextLine();
             String[] parts = userInput.split(" ", 2);
-            String commands = parts[0];
+            String command = parts[0];
 
-            switch (commands) {
+            switch (command) {
             case "bye":
                 printExitMessage();
                 scanner.close();
@@ -95,9 +96,13 @@ public class Edith {
         System.out.println(LINE);
     }
 
+    private static int parseTaskIndex(String userInput) {
+        return Integer.parseInt(userInput.split(" ")[1]) - TASK_INDEX_OFFSET;
+    }
+
     private static void markTask(Task[] tasks, String userInput) {
         System.out.println(LINE);
-        int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
+        int index = parseTaskIndex(userInput);
         Task task = tasks[index];
         task.markAsDone();
         System.out.println("    Nice! I've marked this task as done:");
@@ -107,7 +112,7 @@ public class Edith {
 
     private static void unmarkTask(Task[] tasks, String userInput) {
         System.out.println(LINE);
-        int index = Integer.parseInt(userInput.split(" ")[1]) - 1;
+        int index = parseTaskIndex(userInput);
         Task task = tasks[index];
         task.markAsNotDone();
         System.out.println("    OK, I've marked this task as not done yet:");
