@@ -1,3 +1,11 @@
+package edith.ui;
+
+import edith.task.Deadline;
+import edith.exception.EdithException;
+import edith.task.Event;
+import edith.task.Task;
+import edith.task.Todo;
+
 import java.util.Scanner;
 
 public class Edith {
