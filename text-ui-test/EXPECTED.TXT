@@ -3,6 +3,24 @@
     What can I do for you?
     ___________________________________
     ___________________________________
+    OOPS! The description of todo cannot be empty!
+    ___________________________________
+    ___________________________________
+    OOPS! Follow: deadline <description> /by <time>
+    ___________________________________
+    ___________________________________
+    OOPS! Follow: event <description> /from <start> / to <end>
+    ___________________________________
+    ___________________________________
+    Provide a valid task number
+    ___________________________________
+    ___________________________________
+    Provide a valid task number
+    ___________________________________
+    ___________________________________
+    OOPS! I don't know what that means!
+    ___________________________________
+    ___________________________________
     Got it. I've added this task:
     [T][ ] read book
     Now you have 1 tasks in the list

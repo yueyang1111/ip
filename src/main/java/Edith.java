@@ -13,35 +13,45 @@ public class Edith {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            String userInput = scanner.nextLine();
-            String[] parts = userInput.split(" ", 2);
-            String command = parts[0];
+            try {
+                String userInput = scanner.nextLine();
+                String[] parts = userInput.split(" ", 2);
+                String command = parts[0];
 
-            switch (command) {
-            case "bye":
-                printExitMessage();
-                scanner.close();
-                return;
-            case "list":
-                printTaskList(tasks, taskCount);
-                break;
-            case "mark":
-                markTask(tasks, userInput);
-                break;
-            case "unmark":
-                unmarkTask(tasks, userInput);
-                break;
-            case "todo":
-                tasks[taskCount++] = addTodo(parts[1], taskCount);
-                break;
-            case "event":
-                tasks[taskCount++] = addEvent(parts[1], taskCount);
-                break;
-            case "deadline":
-                tasks[taskCount++] = addDeadline(parts[1], taskCount);
-                break;
-            default:
-                System.out.println("    Invalid Command.");
+                switch (command) {
+                case "bye":
+                    printExitMessage();
+                    scanner.close();
+                    return;
+                case "list":
+                    printTaskList(tasks, taskCount);
+                    break;
+                case "mark":
+                    markTask(tasks, userInput, taskCount);
+                    break;
+                case "unmark":
+                    unmarkTask(tasks, userInput, taskCount);
+                    break;
+                case "todo":
+                    checkTaskLimit(taskCount);
+                    Task todo = addTodo(parts, taskCount);
+                    tasks[taskCount++] = todo;
+                    break;
+                case "event":
+                    checkTaskLimit(taskCount);
+                    Task event = addEvent(parts, taskCount);
+                    tasks[taskCount++] = event;
+                    break;
+                case "deadline":
+                    checkTaskLimit(taskCount);
+                    Task deadline = addDeadline(parts, taskCount);
+                    tasks[taskCount++] = deadline;
+                    break;
+                default:
+                    throw new EdithException("OOPS! I don't know what that means!");
+                }
+            } catch (EdithException e) {
+                printError(e.getMessage());
             }
         }
     }
@@ -68,23 +78,38 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static Task addTodo(String userInput, int taskCount) {
-        Task task = new Todo(userInput);
-        printAddMessage(task, taskCount);
+    private static Task addTodo(String[] parts, int taskCount) throws EdithException {
+        if (parts.length < 2) {
+            throw new EdithException("OOPS! The description of todo cannot be empty!");
+        }
+        Task task = new Todo(parts[1]);
+        printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
 
-    private static Task addEvent(String userInput, int taskCount) {
-        String[] parts = userInput.split(" /from | /to ");
-        Task task = new Event(parts[0], parts[1], parts[2]);
-        printAddMessage(task, taskCount);
+    private static Task addEvent(String[] parts, int taskCount) throws EdithException {
+        if (parts.length < 2) {
+            throw new EdithException("OOPS! The details of event cannot be empty!");
+        }
+        String[] details = parts[1].split(" /from | /to ", 3);
+        if (details.length < 3) {
+            throw new EdithException("OOPS! Follow: event <description> /from <start> / to <end>");
+        }
+        Task task = new Event(details[0], details[1], details[2]);
+        printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
 
-    private static Task addDeadline(String userInput, int taskCount) {
-        String[] parts = userInput.split(" /by ");
-        Task task = new Deadline(parts[0], parts[1]);
-        printAddMessage(task, taskCount);
+    private static Task addDeadline(String[] parts, int taskCount) throws EdithException {
+        if (parts.length < 2) {
+            throw new EdithException("OOPS! The details of deadline cannot be empty");
+        }
+        String[] details = parts[1].split(" /by ", 2);
+        if (details.length < 2) {
+            throw new EdithException("OOPS! Follow: deadline <description> /by <time>");
+        }
+        Task task = new Deadline(details[0], details[1]);
+        printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
 
@@ -96,27 +121,47 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static int parseTaskIndex(String userInput) {
-        return Integer.parseInt(userInput.split(" ")[1]) - TASK_INDEX_OFFSET;
+    private static int parseTaskIndex(String userInput, int taskCount) throws EdithException {
+        try {
+            int index = Integer.parseInt(userInput.split(" ")[1]) - TASK_INDEX_OFFSET;
+            if (index < 0 || index >= taskCount) {
+                throw new EdithException("Invalid task number");
+            }
+            return index;
+        } catch (Exception e) {
+            throw new EdithException("Provide a valid task number");
+        }
     }
 
-    private static void markTask(Task[] tasks, String userInput) {
-        System.out.println(LINE);
-        int index = parseTaskIndex(userInput);
+    private static void markTask(Task[] tasks, String userInput, int taskCount) throws EdithException {
+        int index = parseTaskIndex(userInput, taskCount);
         Task task = tasks[index];
         task.markAsDone();
+        System.out.println(LINE);
         System.out.println("    Nice! I've marked this task as done:");
         System.out.println("    " + task);
         System.out.println(LINE);
     }
 
-    private static void unmarkTask(Task[] tasks, String userInput) {
-        System.out.println(LINE);
-        int index = parseTaskIndex(userInput);
+    private static void unmarkTask(Task[] tasks, String userInput, int taskCount) throws EdithException {
+        int index = parseTaskIndex(userInput, taskCount);
         Task task = tasks[index];
         task.markAsNotDone();
+        System.out.println(LINE);
         System.out.println("    OK, I've marked this task as not done yet:");
         System.out.println("    " + task);
         System.out.println(LINE);
+    }
+
+    private static void printError(String message) {
+        System.out.println(LINE);
+        System.out.println("    " + message);
+        System.out.println(LINE);
+    }
+
+    private static void checkTaskLimit(int taskCount) throws EdithException {
+        if (taskCount >= MAX_TASKS) {
+            throw new EdithException("Oops, task List is full!");
+        }
     }
 }
