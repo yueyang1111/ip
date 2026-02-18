@@ -25,7 +25,7 @@ public class Edith {
         File f = new File(FILEPATH);
         if (f.exists()) {
             try {
-                loadFromFile(FILEPATH);
+                loadFromFile();
             } catch (FileNotFoundException e) {
                 printError(e.getMessage());
             }
@@ -46,30 +46,30 @@ public class Edith {
                     scanner.close();
                     return;
                 case "list":
-                    printTaskList(tasks);
+                    printTaskList();
                     break;
                 case "mark":
-                    markTask(tasks, parts);
+                    markTask(parts);
                     save();
                     break;
                 case "unmark":
-                    unmarkTask(tasks, parts);
+                    unmarkTask(parts);
                     save();
                     break;
                 case "todo":
-                    addTodo(tasks, parts);
+                    addTodo(parts);
                     save();
                     break;
                 case "event":
-                    addEvent(tasks, parts);
+                    addEvent(parts);
                     save();
                     break;
                 case "deadline":
-                    addDeadline(tasks, parts);
+                    addDeadline(parts);
                     save();
                     break;
                 case "delete":
-                    deleteTask(tasks, parts);
+                    deleteTask(parts);
                     save();
                     break;
                 default:
@@ -94,7 +94,7 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static void printTaskList(ArrayList<Task> tasks) throws EdithException {
+    private static void printTaskList() throws EdithException {
         if (tasks.isEmpty()) {
             throw new EdithException("OOPS! The list is empty!");
         }
@@ -106,7 +106,7 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static void addTodo(ArrayList<Task> tasks, String[] parts) throws EdithException {
+    private static void addTodo(String[] parts) throws EdithException {
         if (parts.length < 2) {
             throw new EdithException("OOPS! The description of todo cannot be empty!");
         }
@@ -115,7 +115,7 @@ public class Edith {
         printAddMessage(task, tasks.size());
     }
 
-    private static void addEvent(ArrayList<Task> tasks, String[] parts) throws EdithException {
+    private static void addEvent(String[] parts) throws EdithException {
         if (parts.length < 2) {
             throw new EdithException("OOPS! The details of event cannot be empty!");
         }
@@ -128,7 +128,7 @@ public class Edith {
         printAddMessage(task, tasks.size());
     }
 
-    private static void addDeadline(ArrayList<Task> tasks, String[] parts) throws EdithException {
+    private static void addDeadline(String[] parts) throws EdithException {
         if (parts.length < 2) {
             throw new EdithException("OOPS! The details of deadline cannot be empty");
         }
@@ -149,13 +149,13 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static int parseTaskIndex(String[] parts, int taskSize) throws EdithException {
+    private static int parseTaskIndex(String[] parts) throws EdithException {
         if (parts.length < 2) {
             throw new EdithException("OOPS! Missing index!");
         }
         try {
             int index = Integer.parseInt(parts[1].trim()) - TASK_INDEX_OFFSET;
-            if (index < 0 || index >= taskSize) {
+            if (index < 0 || index >= tasks.size()) {
                 throw new EdithException("Invalid task number");
             }
             return index;
@@ -164,8 +164,8 @@ public class Edith {
         }
     }
 
-    private static void markTask(ArrayList<Task> tasks, String[] parts) throws EdithException {
-        int index = parseTaskIndex(parts, tasks.size());
+    private static void markTask(String[] parts) throws EdithException {
+        int index = parseTaskIndex(parts);
         Task task = tasks.get(index);
         task.markAsDone();
         System.out.println(LINE);
@@ -174,8 +174,8 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static void unmarkTask(ArrayList<Task> tasks, String[] parts) throws EdithException {
-        int index = parseTaskIndex(parts, tasks.size());
+    private static void unmarkTask(String[] parts) throws EdithException {
+        int index = parseTaskIndex(parts);
         Task task = tasks.get(index);
         task.markAsNotDone();
         System.out.println(LINE);
@@ -184,8 +184,8 @@ public class Edith {
         System.out.println(LINE);
     }
 
-    private static void deleteTask(ArrayList<Task> tasks, String[] parts) throws EdithException {
-        int index = parseTaskIndex(parts, tasks.size());
+    private static void deleteTask(String[] parts) throws EdithException {
+        int index = parseTaskIndex(parts);
         Task removedTask = tasks.remove(index);
         System.out.println(LINE);
         System.out.println("    Noted. I've removed this task:");
@@ -234,8 +234,8 @@ public class Edith {
         return task;
     }
 
-    private static void loadFromFile(String filePath) throws FileNotFoundException {
-        File f = new File(filePath);
+    private static void loadFromFile() throws FileNotFoundException {
+        File f = new File(FILEPATH);
         Scanner s = new Scanner(f);
         while (s.hasNext()) {
             String line = s.nextLine();
@@ -249,8 +249,8 @@ public class Edith {
         s.close();
     }
 
-    private static void writeToFile(String filePath, String textToAdd) throws IOException {
-        FileWriter fw = new FileWriter(filePath);
+    private static void writeToFile(String textToAdd) throws IOException {
+        FileWriter fw = new FileWriter(FILEPATH);
         fw.write(textToAdd);
         fw.close();
     }
@@ -267,7 +267,7 @@ public class Edith {
             for (int i = 0; i < tasks.size(); i++) {
                 textToWrite += tasks.get(i).toFileString() + System.lineSeparator();
             }
-            writeToFile(FILEPATH, textToWrite);
+            writeToFile(textToWrite);
         } catch (IOException e) {
             printError(e.getMessage());
         }
