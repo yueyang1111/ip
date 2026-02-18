@@ -8,14 +8,29 @@ import edith.task.Todo;
 
 import java.util.Scanner;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Edith {
     private static final int TASK_INDEX_OFFSET = 1;
     private static final String LINE = "    ___________________________________";
     private static final int MAX_TASKS = 100;
+    private static final String FILEPATH = "./data/edith.txt";
+
+    private static final Task[] tasks = new Task[MAX_TASKS];
+    private static int taskCount = 0;
 
     public static void main(String[] args) {
-        Task[] tasks = new Task[MAX_TASKS];
-        int taskCount = 0;
+        File f = new File(FILEPATH);
+        if (f.exists()) {
+            try {
+                loadFromFile(FILEPATH);
+            } catch (FileNotFoundException e) {
+                printError(e.getMessage());
+            }
+        }
 
         printGreeting();
         Scanner scanner = new Scanner(System.in);
@@ -24,7 +39,7 @@ public class Edith {
             try {
                 String userInput = scanner.nextLine();
                 String[] parts = userInput.split(" ", 2);
-                String command = parts[0];
+                String command = parts[0].trim();
 
                 switch (command) {
                 case "bye":
@@ -36,24 +51,29 @@ public class Edith {
                     break;
                 case "mark":
                     markTask(tasks, userInput, taskCount);
+                    save();
                     break;
                 case "unmark":
                     unmarkTask(tasks, userInput, taskCount);
+                    save();
                     break;
                 case "todo":
                     checkTaskLimit(taskCount);
                     Task todo = addTodo(parts, taskCount);
                     tasks[taskCount++] = todo;
+                    save();
                     break;
                 case "event":
                     checkTaskLimit(taskCount);
                     Task event = addEvent(parts, taskCount);
                     tasks[taskCount++] = event;
+                    save();
                     break;
                 case "deadline":
                     checkTaskLimit(taskCount);
                     Task deadline = addDeadline(parts, taskCount);
                     tasks[taskCount++] = deadline;
+                    save();
                     break;
                 default:
                     throw new EdithException("OOPS! I don't know what that means!");
@@ -90,7 +110,7 @@ public class Edith {
         if (parts.length < 2) {
             throw new EdithException("OOPS! The description of todo cannot be empty!");
         }
-        Task task = new Todo(parts[1]);
+        Task task = new Todo(parts[1].trim());
         printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
@@ -103,7 +123,7 @@ public class Edith {
         if (details.length < 3) {
             throw new EdithException("OOPS! Follow: event <description> /from <start> / to <end>");
         }
-        Task task = new Event(details[0], details[1], details[2]);
+        Task task = new Event(details[0].trim(), details[1].trim(), details[2].trim());
         printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
@@ -116,7 +136,7 @@ public class Edith {
         if (details.length < 2) {
             throw new EdithException("OOPS! Follow: deadline <description> /by <time>");
         }
-        Task task = new Deadline(details[0], details[1]);
+        Task task = new Deadline(details[0].trim(), details[1].trim());
         printAddMessage(task, taskCount + TASK_INDEX_OFFSET);
         return task;
     }
@@ -131,7 +151,7 @@ public class Edith {
 
     private static int parseTaskIndex(String userInput, int taskCount) throws EdithException {
         try {
-            int index = Integer.parseInt(userInput.split(" ")[1]) - TASK_INDEX_OFFSET;
+            int index = Integer.parseInt(userInput.split(" ")[1].trim()) - TASK_INDEX_OFFSET;
             if (index < 0 || index >= taskCount) {
                 throw new EdithException("Invalid task number");
             }
@@ -170,6 +190,79 @@ public class Edith {
     private static void checkTaskLimit(int taskCount) throws EdithException {
         if (taskCount >= MAX_TASKS) {
             throw new EdithException("Oops, task List is full!");
+        }
+    }
+
+    private static Task parseTaskData(String line) throws EdithException {
+        String [] parts = line.split("\\|");
+        String command = parts[0].trim();
+        boolean isDone = parts[1].trim().equals("1");
+
+        Task task;
+        switch (command) {
+        case "T":
+            if (parts.length < 3) {
+                throw new EdithException("Skip corrupted line: " + line);
+            }
+            task = new Todo(parts[2].trim());
+            break;
+        case "D":
+            if (parts.length < 4) {
+                throw new EdithException("Skip corrupted line: " + line);
+            }
+            task = new Deadline(parts[2].trim(), parts[3].trim());
+            break;
+        case "E":
+            if (parts.length < 5) {
+                throw new EdithException("Skip corrupted line: " + line);
+            }
+            task = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
+            break;
+        default:
+            throw new EdithException("Skip corrupted line" + line);
+        }
+        if (isDone) {
+            task.markAsDone();
+        }
+        return task;
+    }
+
+    private static void loadFromFile(String filePath) throws FileNotFoundException {
+        File f = new File(filePath);
+        Scanner s = new Scanner(f);
+        while (s.hasNext()) {
+            String line = s.nextLine();
+            try {
+                Task task = parseTaskData(line);
+                tasks[taskCount++] = task;
+            } catch (EdithException e) {
+                printError(e.getMessage());
+            }
+        }
+        s.close();
+    }
+
+    private static void writeToFile(String filePath, String textToAdd) throws IOException {
+        FileWriter fw = new FileWriter(filePath);
+        fw.write(textToAdd);
+        fw.close();
+    }
+
+    private static void save() {
+        try {
+            File f = new File(FILEPATH);
+            File parent = f.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+
+            String textToWrite = "";
+            for (int i = 0; i < taskCount; i++) {
+                textToWrite += tasks[i].toFileString() + System.lineSeparator();
+            }
+            writeToFile(FILEPATH, textToWrite);
+        } catch (IOException e) {
+            printError(e.getMessage());
         }
     }
 }
