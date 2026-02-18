@@ -3,6 +3,7 @@ deadline return book
 event meeting
 mark
 unmark
+delete
 blah
 todo read book
 deadline return book /by June 6th
@@ -13,5 +14,7 @@ list
 mark 2
 list
 unmark 2
+list
+delete 1
 list
 bye

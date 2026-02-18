@@ -12,10 +12,13 @@
     OOPS! Follow: event <description> /from <start> / to <end>
     ___________________________________
     ___________________________________
-    Provide a valid task number
+    OOPS! Missing index!
     ___________________________________
     ___________________________________
-    Provide a valid task number
+    OOPS! Missing index!
+    ___________________________________
+    ___________________________________
+    OOPS! Missing index!
     ___________________________________
     ___________________________________
     OOPS! I don't know what that means!
@@ -76,6 +79,18 @@
     3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
     4.[T][ ] join sports club
     5.[T][ ] borrow book
+    ___________________________________
+    ___________________________________
+    Noted. I've removed this task:
+    [T][ ] read book
+    Now you have 4 tasks in the list
+    ___________________________________
+    ___________________________________
+    Here are the tasks in your list:
+    1.[D][ ] return book (by: June 6th)
+    2.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    3.[T][ ] join sports club
+    4.[T][ ] borrow book
     ___________________________________
     ___________________________________
     Bye. Hope to see you again soon!
