@@ -5,10 +5,10 @@ import edith.task.Deadline;
 import edith.exception.EdithException;
 import edith.task.Event;
 import edith.task.Task;
+import edith.task.TaskList;
 import edith.task.Todo;
 import edith.ui.Ui;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import java.io.FileNotFoundException;
@@ -17,15 +17,16 @@ public class Edith {
     private static final int TASK_INDEX_OFFSET = 1;
     private static final String FILEPATH = "./data/edith.txt";
 
-    private static final ArrayList<Task> tasks = new ArrayList<>();
     private static final Ui ui = new Ui();
     private static final Storage storage = new Storage(FILEPATH);
+    private static TaskList tasks;
 
     public static void main(String[] args) {
         try {
-            tasks.addAll(storage.loadFromFile());
+            tasks = new TaskList(storage.loadFromFile());
         } catch (EdithException | FileNotFoundException e) {
             ui.printError(e.getMessage());
+            tasks = new TaskList();
         }
 
         ui.printGreeting();
@@ -43,31 +44,31 @@ public class Edith {
                     scanner.close();
                     return;
                 case "list":
-                    ui.printTaskList(tasks);
+                    ui.printTaskList(tasks.getAll());
                     break;
                 case "mark":
                     markTask(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 case "unmark":
                     unmarkTask(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 case "todo":
                     addTodo(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 case "event":
                     addEvent(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 case "deadline":
                     addDeadline(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 case "delete":
                     deleteTask(parts);
-                    storage.save(tasks);
+                    storage.save(tasks.getAll());
                     break;
                 default:
                     throw new EdithException("OOPS! I don't know what that means!");
@@ -130,21 +131,19 @@ public class Edith {
 
     private static void markTask(String[] parts) throws EdithException {
         int index = parseTaskIndex(parts);
-        Task task = tasks.get(index);
-        task.markAsDone();
+        Task task = tasks.mark(index);
         ui.printMarkMessage(task);
     }
 
     private static void unmarkTask(String[] parts) throws EdithException {
         int index = parseTaskIndex(parts);
-        Task task = tasks.get(index);
-        task.markAsNotDone();
+        Task task = tasks.unmark(index);
         ui.printUnmarkMessage(task);
     }
 
     private static void deleteTask(String[] parts) throws EdithException {
         int index = parseTaskIndex(parts);
-        Task removedTask = tasks.remove(index);
+        Task removedTask = tasks.delete(index);
         ui.printDeleteMessage(removedTask, tasks.size());
     }
 }
