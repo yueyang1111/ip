@@ -1,5 +1,6 @@
 package edith;
 
+import edith.storage.Storage;
 import edith.task.Deadline;
 import edith.exception.EdithException;
 import edith.task.Event;
@@ -10,10 +11,7 @@ import edith.ui.Ui;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 
 public class Edith {
     private static final int TASK_INDEX_OFFSET = 1;
@@ -21,15 +19,13 @@ public class Edith {
 
     private static final ArrayList<Task> tasks = new ArrayList<>();
     private static final Ui ui = new Ui();
+    private static final Storage storage = new Storage(FILEPATH);
 
     public static void main(String[] args) {
-        File f = new File(FILEPATH);
-        if (f.exists()) {
-            try {
-                loadFromFile();
-            } catch (FileNotFoundException e) {
-                ui.printError(e.getMessage());
-            }
+        try {
+            tasks.addAll(storage.loadFromFile());
+        } catch (EdithException | FileNotFoundException e) {
+            ui.printError(e.getMessage());
         }
 
         ui.printGreeting();
@@ -51,27 +47,27 @@ public class Edith {
                     break;
                 case "mark":
                     markTask(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 case "unmark":
                     unmarkTask(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 case "todo":
                     addTodo(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 case "event":
                     addEvent(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 case "deadline":
                     addDeadline(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 case "delete":
                     deleteTask(parts);
-                    save();
+                    storage.save(tasks);
                     break;
                 default:
                     throw new EdithException("OOPS! I don't know what that means!");
@@ -150,81 +146,5 @@ public class Edith {
         int index = parseTaskIndex(parts);
         Task removedTask = tasks.remove(index);
         ui.printDeleteMessage(removedTask, tasks.size());
-    }
-
-    private static Task parseTaskData(String line) throws EdithException {
-        String [] parts = line.split("\\|");
-        if (parts.length < 2) {
-            throw new EdithException("Skip corrupted line: " + line);
-        }
-        String command = parts[0].trim();
-        boolean isDone = parts[1].trim().equals("1");
-
-        Task task;
-        switch (command) {
-        case "T":
-            if (parts.length < 3) {
-                throw new EdithException("Skip corrupted line: " + line);
-            }
-            task = new Todo(parts[2].trim());
-            break;
-        case "D":
-            if (parts.length < 4) {
-                throw new EdithException("Skip corrupted line: " + line);
-            }
-            task = new Deadline(parts[2].trim(), parts[3].trim());
-            break;
-        case "E":
-            if (parts.length < 5) {
-                throw new EdithException("Skip corrupted line: " + line);
-            }
-            task = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
-            break;
-        default:
-            throw new EdithException("Skip corrupted line: " + line);
-        }
-        if (isDone) {
-            task.markAsDone();
-        }
-        return task;
-    }
-
-    private static void loadFromFile() throws FileNotFoundException {
-        File f = new File(FILEPATH);
-        Scanner s = new Scanner(f);
-        while (s.hasNext()) {
-            String line = s.nextLine();
-            try {
-                Task task = parseTaskData(line);
-                tasks.add(task);
-            } catch (EdithException e) {
-                ui.printError(e.getMessage());
-            }
-        }
-        s.close();
-    }
-
-    private static void writeToFile(String textToAdd) throws IOException {
-        FileWriter fw = new FileWriter(FILEPATH);
-        fw.write(textToAdd);
-        fw.close();
-    }
-
-    private static void save() {
-        try {
-            File f = new File(FILEPATH);
-            File parent = f.getParentFile();
-            if (parent != null && !parent.exists()) {
-                parent.mkdirs();
-            }
-
-            String textToWrite = "";
-            for (int i = 0; i < tasks.size(); i++) {
-                textToWrite += tasks.get(i).toFileString() + System.lineSeparator();
-            }
-            writeToFile(textToWrite);
-        } catch (IOException e) {
-            ui.printError(e.getMessage());
-        }
     }
 }
