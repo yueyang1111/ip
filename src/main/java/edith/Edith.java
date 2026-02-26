@@ -1,10 +1,11 @@
-package edith.ui;
+package edith;
 
 import edith.task.Deadline;
 import edith.exception.EdithException;
 import edith.task.Event;
 import edith.task.Task;
 import edith.task.Todo;
+import edith.ui.Ui;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -16,10 +17,10 @@ import java.io.IOException;
 
 public class Edith {
     private static final int TASK_INDEX_OFFSET = 1;
-    private static final String LINE = "    ___________________________________";
     private static final String FILEPATH = "./data/edith.txt";
 
     private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static final Ui ui = new Ui();
 
     public static void main(String[] args) {
         File f = new File(FILEPATH);
@@ -27,11 +28,11 @@ public class Edith {
             try {
                 loadFromFile();
             } catch (FileNotFoundException e) {
-                printError(e.getMessage());
+                ui.printError(e.getMessage());
             }
         }
 
-        printGreeting();
+        ui.printGreeting();
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -42,11 +43,11 @@ public class Edith {
 
                 switch (command) {
                 case "bye":
-                    printExitMessage();
+                    ui.printExitMessage();
                     scanner.close();
                     return;
                 case "list":
-                    printTaskList();
+                    ui.printTaskList(tasks);
                     break;
                 case "mark":
                     markTask(parts);
@@ -76,34 +77,9 @@ public class Edith {
                     throw new EdithException("OOPS! I don't know what that means!");
                 }
             } catch (EdithException e) {
-                printError(e.getMessage());
+                ui.printError(e.getMessage());
             }
         }
-    }
-
-    private static void printGreeting() {
-        System.out.println(LINE);
-        System.out.println("    Hello! I'm Edith");
-        System.out.println("    What can I do for you?");
-        System.out.println(LINE);
-    }
-
-    private static void printExitMessage() {
-        System.out.println(LINE);
-        System.out.println("    Bye. Hope to see you again soon!");
-        System.out.println(LINE);
-    }
-
-    private static void printTaskList() throws EdithException {
-        if (tasks.isEmpty()) {
-            throw new EdithException("OOPS! The list is empty!");
-        }
-        System.out.println(LINE);
-        System.out.println("    Here are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println("    " + (i + 1) + "." + tasks.get(i));
-        }
-        System.out.println(LINE);
     }
 
     private static void addTodo(String[] parts) throws EdithException {
@@ -112,7 +88,7 @@ public class Edith {
         }
         Task task = new Todo(parts[1].trim());
         tasks.add(task);
-        printAddMessage(task, tasks.size());
+        ui.printAddMessage(task, tasks.size());
     }
 
     private static void addEvent(String[] parts) throws EdithException {
@@ -125,7 +101,7 @@ public class Edith {
         }
         Task task = new Event(details[0].trim(), details[1].trim(), details[2].trim());
         tasks.add(task);
-        printAddMessage(task, tasks.size());
+        ui.printAddMessage(task, tasks.size());
     }
 
     private static void addDeadline(String[] parts) throws EdithException {
@@ -138,15 +114,7 @@ public class Edith {
         }
         Task task = new Deadline(details[0].trim(), details[1].trim());
         tasks.add(task);
-        printAddMessage(task, tasks.size());
-    }
-
-    private static void printAddMessage(Task task, int taskCount) {
-        System.out.println(LINE);
-        System.out.println("    Got it. I've added this task:");
-        System.out.println("    " + task);
-        System.out.println("    Now you have " + taskCount + " tasks in the list");
-        System.out.println(LINE);
+        ui.printAddMessage(task, tasks.size());
     }
 
     private static int parseTaskIndex(String[] parts) throws EdithException {
@@ -168,40 +136,27 @@ public class Edith {
         int index = parseTaskIndex(parts);
         Task task = tasks.get(index);
         task.markAsDone();
-        System.out.println(LINE);
-        System.out.println("    Nice! I've marked this task as done:");
-        System.out.println("    " + task);
-        System.out.println(LINE);
+        ui.printMarkMessage(task);
     }
 
     private static void unmarkTask(String[] parts) throws EdithException {
         int index = parseTaskIndex(parts);
         Task task = tasks.get(index);
         task.markAsNotDone();
-        System.out.println(LINE);
-        System.out.println("    OK, I've marked this task as not done yet:");
-        System.out.println("    " + task);
-        System.out.println(LINE);
+        ui.printUnmarkMessage(task);
     }
 
     private static void deleteTask(String[] parts) throws EdithException {
         int index = parseTaskIndex(parts);
         Task removedTask = tasks.remove(index);
-        System.out.println(LINE);
-        System.out.println("    Noted. I've removed this task:");
-        System.out.println("    " + removedTask);
-        System.out.println("    Now you have " + tasks.size() + " tasks in the list");
-        System.out.println(LINE);
-    }
-
-    private static void printError(String message) {
-        System.out.println(LINE);
-        System.out.println("    " + message);
-        System.out.println(LINE);
+        ui.printDeleteMessage(removedTask, tasks.size());
     }
 
     private static Task parseTaskData(String line) throws EdithException {
         String [] parts = line.split("\\|");
+        if (parts.length < 2) {
+            throw new EdithException("Skip corrupted line: " + line);
+        }
         String command = parts[0].trim();
         boolean isDone = parts[1].trim().equals("1");
 
@@ -243,7 +198,7 @@ public class Edith {
                 Task task = parseTaskData(line);
                 tasks.add(task);
             } catch (EdithException e) {
-                printError(e.getMessage());
+                ui.printError(e.getMessage());
             }
         }
         s.close();
@@ -269,7 +224,7 @@ public class Edith {
             }
             writeToFile(textToWrite);
         } catch (IOException e) {
-            printError(e.getMessage());
+            ui.printError(e.getMessage());
         }
     }
 }
