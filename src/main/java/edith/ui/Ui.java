@@ -4,10 +4,24 @@ import edith.exception.EdithException;
 import edith.task.Task;
 
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Ui {
     private static final String INDENT = "    ";
     private static final String LINE = INDENT + "___________________________________";
+    private final Scanner scanner;
+
+    public Ui() {
+        scanner = new Scanner(System.in);
+    }
+
+    public String readCommand() {
+        return scanner.nextLine();
+    }
+
+    public void close() {
+        scanner.close();
+    }
 
     public void showLine() {
         System.out.println(LINE);
