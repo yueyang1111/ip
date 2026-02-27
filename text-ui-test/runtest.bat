@@ -7,7 +7,7 @@ REM delete output from previous run
 if exist ACTUAL.TXT del ACTUAL.TXT
 
 REM compile the code into the bin folder
-javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\edith\*.java ..\src\main\java\edith\ui\*.java ..\src\main\java\edith\task\*.java ..\src\main\java\edith\exception\*.java ..\src\main\java\edith\storage\*.java
+javac  -cp ..\src\main\java -Xlint:none -d ..\bin ..\src\main\java\edith\*.java ..\src\main\java\edith\ui\*.java ..\src\main\java\edith\task\*.java ..\src\main\java\edith\exception\*.java ..\src\main\java\edith\storage\*.java ..\src\main\java\edith\command\*.java ..\src\main\java\edith\parser\*.java
 IF ERRORLEVEL 1 (
     echo ********** BUILD FAILURE **********
     exit /b 1
