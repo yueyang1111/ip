@@ -49,4 +49,21 @@ public class TaskList {
         Task removedTask = tasks.remove(index);
         return removedTask;
     }
+
+    public TaskList find(String keyword) {
+        TaskList foundTasks = new TaskList();
+
+        String target = keyword.trim().toLowerCase();
+        if (target.isEmpty()) {
+            return foundTasks;
+        }
+
+        for (Task t : tasks) {
+            String candidate = t.getDescription().toLowerCase();
+            if (candidate.contains(target)) {
+                foundTasks.add(t);
+            }
+        }
+        return foundTasks;
+    }
 }

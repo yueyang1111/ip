@@ -97,4 +97,17 @@ public class Ui {
         printMessage(message);
         showLine();
     }
+
+    public void printFoundTasksMessage(ArrayList<Task> tasks) throws EdithException {
+        if (tasks.isEmpty()) {
+            throw new EdithException("Oops! No matches found!");
+        }
+
+        showLine();
+        printMessage("Here are the matching tasks in your list:");
+        for (int i = 0; i < tasks.size(); i++) {
+            printMessage((i+1) + "." + tasks.get(i));
+        }
+        showLine();
+    }
 }
