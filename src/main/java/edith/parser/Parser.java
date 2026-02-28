@@ -5,6 +5,7 @@ import edith.command.DeadlineCommand;
 import edith.command.DeleteCommand;
 import edith.command.EventCommand;
 import edith.command.ExitCommand;
+import edith.command.FindCommand;
 import edith.command.ListCommand;
 import edith.command.MarkCommand;
 import edith.command.TodoCommand;
@@ -51,6 +52,8 @@ public class Parser {
             return new DeadlineCommand(details);
         case "delete":
             return new DeleteCommand(details);
+        case "find":
+            return new FindCommand(details);
         default:
             throw new EdithException("OOPS! I don't know what that means!");
         }
