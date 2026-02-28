@@ -6,6 +6,7 @@ import edith.task.Task;
 import edith.task.Todo;
 import edith.exception.EdithException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -41,13 +42,18 @@ public class Storage {
             if (parts.length < 4) {
                 throw new EdithException("Skip corrupted line: " + line);
             }
-            task = new Deadline(parts[2].trim(), parts[3].trim());
+            String deadlineDescription = parts[2].trim();
+            LocalDateTime by = LocalDateTime.parse(parts[3].trim());
+            task = new Deadline(deadlineDescription, by);
             break;
         case "E":
             if (parts.length < 5) {
                 throw new EdithException("Skip corrupted line: " + line);
             }
-            task = new Event(parts[2].trim(), parts[3].trim(), parts[4].trim());
+            String eventDescription = parts[2].trim();
+            LocalDateTime from = LocalDateTime.parse(parts[3].trim());
+            LocalDateTime to = LocalDateTime.parse(parts[4].trim());
+            task = new Event(eventDescription, from, to);
             break;
         default:
             throw new EdithException("Skip corrupted line: " + line);
