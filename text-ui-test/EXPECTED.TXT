@@ -58,6 +58,12 @@
     Now you have 5 tasks in the list
     ___________________________________
     ___________________________________
+    Here are the matching tasks in your list:
+    1.[T][ ] read book
+    2.[D][ ] return book (by: Jan 1 2026, 12:00am)
+    3.[T][ ] borrow book
+    ___________________________________
+    ___________________________________
     Here are the tasks in your list:
     1.[T][ ] read book
     2.[D][ ] return book (by: Jan 1 2026, 12:00am)
