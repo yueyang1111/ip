@@ -10,13 +10,30 @@ import edith.ui.Ui;
 
 import java.time.LocalDateTime;
 
+/**
+ * Represents a command that adds a event tasks.
+ */
 public class EventCommand extends Command {
     private final String userInput;
 
+    /**
+     * Creates a EventCommand with the given input details.
+     *
+     * @param userInput Details of the user input.
+     */
     public EventCommand(String userInput) {
         this.userInput = userInput;
     }
 
+    /**
+     * Parse the event details, creates and adds event task,
+     * saves the updated list.
+     *
+     * @param tasks Current TaskList.
+     * @param ui The Ui for user interaction.
+     * @param storage Storage for file persistence.
+     * @throws EdithException If the input format is invalid.
+     */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws EdithException {
         if (userInput.trim().isEmpty()) {
