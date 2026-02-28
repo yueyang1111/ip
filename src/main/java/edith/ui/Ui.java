@@ -156,6 +156,12 @@ public class Ui {
         showLine();
     }
 
+    /**
+     * Prints all the task that contains the keyword.
+     *
+     * @param tasks List of matching tasks.
+     * @throws EdithException If no matching task is found.
+     */
     public void printFoundTasksMessage(ArrayList<Task> tasks) throws EdithException {
         if (tasks.isEmpty()) {
             throw new EdithException("Oops! No matches found!");

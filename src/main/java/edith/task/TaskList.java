@@ -107,6 +107,12 @@ public class TaskList {
         return removedTask;
     }
 
+    /**
+     * Find tasks whose description contains the given keyword.
+     *
+     * @param keyword Keyword to search for.
+     * @return A TaskList consisting of the matching tasks.
+     */
     public TaskList find(String keyword) {
         TaskList foundTasks = new TaskList();
 
