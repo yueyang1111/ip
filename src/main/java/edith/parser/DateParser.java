@@ -8,6 +8,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Represent a class for parsing and formatting date and time value.
+ * <p>
+ * Supports multiple input formats for date and date time strings.
+ * Converts valid inpout into a standard format.
+ */
 public class DateParser {
     private static final String[] DATETIME_PATTERN = {
             "d/M/yyyy HHmm", "d-M-yyyy HHmm", "yyyy-M-d HHmm"
@@ -20,6 +26,13 @@ public class DateParser {
     private static final DateTimeFormatter OUTPUT_FORMAT =
             DateTimeFormatter.ofPattern("MMM d yyyy, h:mma");
 
+    /**
+     * Parse the given input string into a standard format.
+     *
+     * @param input The date/time string provide by the user.
+     * @return The formatted date/time.
+     * @throws EdithException If the input does not match the supported format.
+     */
     public static LocalDateTime parseDate(String input) throws EdithException {
         if (input == null) {
             throw new EdithException("OOPS! Date cannot be empty");
@@ -57,6 +70,12 @@ public class DateParser {
         }
     }
 
+    /**
+     * Formats the date/time into a user-friendly string.
+     *
+     * @param date The date/time to be formatted.
+     * @return Formatted date string.
+     */
     public static String formatDate(LocalDateTime date) {
         return date.format(OUTPUT_FORMAT);
     }

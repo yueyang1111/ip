@@ -7,6 +7,12 @@ import edith.exception.EdithException;
 import edith.task.TaskList;
 import edith.ui.Ui;
 
+/**
+ * Main class of Edith chatbot.
+ * <p>
+ * Initialize the core components (Ui, Storage and TaskList)
+ * and run the command processing loop.
+ */
 public class Edith {
     private static final String FILEPATH = "./data/edith.txt";
 
@@ -14,6 +20,12 @@ public class Edith {
     private final Storage storage;
     private TaskList tasks;
 
+    /**
+     * Creates an instance of Edith with the specified filepath
+     * for file persistence.
+     *
+     * @param filePath Relative path of the data file.
+     */
     public Edith(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -26,6 +38,13 @@ public class Edith {
         }
     }
 
+    /**
+     * Starts Edith and process the user command until an
+     * exit command is given.
+     * <p>
+     * This method reads the user input, parse the information
+     * and executes the command.
+     */
     public void run() {
         ui.printGreeting();
         boolean isExit = false;
@@ -43,6 +62,11 @@ public class Edith {
         ui.close();
     }
 
+    /**
+     * Entry point for Edith chatbot.
+     *
+     * @param args Not used.
+     */
     public static void main(String[] args) {
         new Edith(FILEPATH).run();
     }

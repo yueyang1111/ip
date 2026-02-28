@@ -12,7 +12,20 @@ import edith.command.TodoCommand;
 import edith.command.UnmarkCommand;
 import edith.exception.EdithException;
 
+/**
+ * Parse raw user input into Command objects.
+ * <p>
+ * Identifies the command keyword and calls the
+ * corresponding Command subclasses.
+ */
 public class Parser {
+    /**
+     * Parse a user input string and returns the corresponding command.
+     *
+     * @param userInput Raw input from the user.
+     * @return Command object for the requested operation.
+     * @throws EdithException If the command is empty or invalid.
+     */
     public static Command parse(String userInput) throws EdithException {
         if (userInput.trim().isEmpty()) {
             throw new EdithException("Oops! Empty Command");

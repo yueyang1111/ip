@@ -17,16 +17,31 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Handles the loading of tasks from and
+ * saving of tasks to disk.
+ */
 public class Storage {
     public static final String TODO = "T";
     public static final String DEADLINE = "D";
     public static final String EVENT = "E";
     private final File dataFile;
 
+    /**
+     * Creates a storage object that reads and
+     * writes to the specified filepath.
+     *
+     * @param filePath Path to the data file.
+     */
     public Storage(String filePath) {
         this.dataFile = new File(filePath);
     }
 
+    /**
+     * Creates the file/folder if they do not exist.
+     *
+     * @throws IOException If the operation fails.
+     */
     public void createFile() throws IOException {
         try {
             if (dataFile.exists()) {
@@ -53,6 +68,12 @@ public class Storage {
         return new ArrayList<>(Files.readAllLines(dataFile.toPath(), Charset.defaultCharset()));
     }
 
+    /**
+     * Loads tasks from data file.
+     *
+     * @return A list of tasks loaded from the disk.
+     * @throws EdithException If hte file contains corrupted lines.
+     */
     public ArrayList<Task> loadFromFile() throws EdithException {
         ArrayList<Task> loadedTasks = new ArrayList<>();
         try {
@@ -64,6 +85,12 @@ public class Storage {
         return loadedTasks;
     }
 
+    /**
+     * Returns the tasks read from the data line.
+     *
+     * @param lines Lines in the data file.
+     * @return List of tasks parsed.
+     */
     private ArrayList<Task> parse(ArrayList<String> lines) {
         ArrayList<Task> allTasks = new ArrayList<>();
 
@@ -91,6 +118,13 @@ public class Storage {
 
     }
 
+    /**
+     * Parse a given line from the data file into a Task object.
+     *
+     * @param line A line from the data file.
+     * @return Task object identified.
+     * @throws EdithException If the line is corrupted.
+     */
     private static Task parseTaskData(String line) throws EdithException {
         String [] parts = line.split("\\|");
         if (parts.length < 2) {
@@ -133,12 +167,24 @@ public class Storage {
         return task;
     }
 
+    /**
+     * Writes the content into the data file.
+     *
+     * @param textToAdd Content to write to the data file.
+     * @throws IOException If the operation fails.
+     */
     public void writeToFile(String textToAdd) throws IOException {
         FileWriter fw = new FileWriter(dataFile);
         fw.write(textToAdd);
         fw.close();
     }
 
+    /**
+     * Saves the given list of tasks to the disk.
+     *
+     * @param tasks List of tasks to be saved.
+     * @throws EdithException If the operation fails.
+     */
     public void save(ArrayList<Task> tasks) throws EdithException {
         try {
             createFile();
