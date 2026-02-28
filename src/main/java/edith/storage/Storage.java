@@ -6,9 +6,11 @@ import edith.task.Task;
 import edith.task.Todo;
 import edith.exception.EdithException;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +18,77 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Storage {
-    private final String filePath;
+    public static final String TODO = "T";
+    public static final String DEADLINE = "D";
+    public static final String EVENT = "E";
+    private final File dataFile;
 
     public Storage(String filePath) {
-        this.filePath = filePath;
+        this.dataFile = new File(filePath);
+    }
+
+    public void createFile() throws IOException {
+        try {
+            if (dataFile.exists()) {
+                return;
+            }
+            File parent = dataFile.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
+            }
+            dataFile.createNewFile();
+        } catch (IOException e) {
+            throw new IOException("Cannot create file; reason: " + e.getMessage());
+        }
+    }
+
+    private ArrayList<String> readFile() throws IOException {
+        createFile();
+        if (!dataFile.exists()) {
+            throw new FileNotFoundException();
+        }
+        if (dataFile.length() == 0) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Files.readAllLines(dataFile.toPath(), Charset.defaultCharset()));
+    }
+
+    public ArrayList<Task> loadFromFile() throws EdithException {
+        ArrayList<Task> loadedTasks = new ArrayList<>();
+        try {
+            ArrayList<String> lines = readFile();
+            loadedTasks = parse(lines);
+        } catch (IOException e) {
+            System.out.println("Fail to load data file: " + e.getMessage());
+        }
+        return loadedTasks;
+    }
+
+    private ArrayList<Task> parse(ArrayList<String> lines) {
+        ArrayList<Task> allTasks = new ArrayList<>();
+
+        for (String line: lines) {
+            if (line == null || line.trim().isEmpty()) {
+                continue;
+            }
+
+            try {
+                Task task = parseTaskData(line.trim());
+                allTasks.add(task);
+            } catch (EdithException e) {
+                System.out.println("Skipping corrupted line: "+ line);
+            }
+        }
+        return allTasks;
+    }
+
+    private static LocalDateTime convertToFormat(String date, String line) throws EdithException {
+        try {
+            return LocalDateTime.parse(date);
+        } catch (DateTimeParseException e) {
+            throw new EdithException("Skipping corrupted line: " + line);
+        }
+
     }
 
     private static Task parseTaskData(String line) throws EdithException {
@@ -32,27 +101,27 @@ public class Storage {
 
         Task task;
         switch (command) {
-        case "T":
+        case TODO:
             if (parts.length < 3) {
                 throw new EdithException("Skip corrupted line: " + line);
             }
             task = new Todo(parts[2].trim());
             break;
-        case "D":
+        case DEADLINE:
             if (parts.length < 4) {
                 throw new EdithException("Skip corrupted line: " + line);
             }
             String deadlineDescription = parts[2].trim();
-            LocalDateTime by = LocalDateTime.parse(parts[3].trim());
+            LocalDateTime by = convertToFormat(parts[3].trim(), line);
             task = new Deadline(deadlineDescription, by);
             break;
-        case "E":
+        case EVENT:
             if (parts.length < 5) {
                 throw new EdithException("Skip corrupted line: " + line);
             }
             String eventDescription = parts[2].trim();
-            LocalDateTime from = LocalDateTime.parse(parts[3].trim());
-            LocalDateTime to = LocalDateTime.parse(parts[4].trim());
+            LocalDateTime from = convertToFormat(parts[3].trim(), line);
+            LocalDateTime to = convertToFormat(parts[4].trim(), line);
             task = new Event(eventDescription, from, to);
             break;
         default:
@@ -64,41 +133,15 @@ public class Storage {
         return task;
     }
 
-    public ArrayList<Task> loadFromFile() throws FileNotFoundException, EdithException {
-        ArrayList<Task> loadedTasks = new ArrayList<>();
-        File f = new File(filePath);
-
-        if (!f.exists()) {
-            return loadedTasks;
-        }
-
-        Scanner s = new Scanner(f);
-        while (s.hasNext()) {
-            String line = s.nextLine();
-            try {
-                Task task = parseTaskData(line);
-                loadedTasks.add(task);
-            } catch (EdithException e) {
-                throw new EdithException("Corrupted file: " + e.getMessage());
-            }
-        }
-        s.close();
-        return loadedTasks;
-    }
-
     public void writeToFile(String textToAdd) throws IOException {
-        FileWriter fw = new FileWriter(filePath);
+        FileWriter fw = new FileWriter(dataFile);
         fw.write(textToAdd);
         fw.close();
     }
 
     public void save(ArrayList<Task> tasks) throws EdithException {
         try {
-            File f = new File(filePath);
-            File parent = f.getParentFile();
-            if (parent != null && !parent.exists()) {
-                parent.mkdirs();
-            }
+            createFile();
 
             String textToWrite = "";
             for (int i = 0; i < tasks.size(); i++) {

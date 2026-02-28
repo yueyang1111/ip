@@ -7,8 +7,6 @@ import edith.exception.EdithException;
 import edith.task.TaskList;
 import edith.ui.Ui;
 
-import java.io.FileNotFoundException;
-
 public class Edith {
     private static final String FILEPATH = "./data/edith.txt";
 
@@ -22,7 +20,7 @@ public class Edith {
 
         try {
             tasks = new TaskList(storage.loadFromFile());
-        } catch (EdithException | FileNotFoundException e) {
+        } catch (EdithException e) {
             ui.printError(e.getMessage());
             tasks = new TaskList();
         }
