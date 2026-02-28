@@ -9,7 +9,7 @@
     OOPS! Follow: deadline <description> /by <time>
     ___________________________________
     ___________________________________
-    OOPS! Follow: event <description> /from <start> / to <end>
+    OOPS! Follow: event <description> /from <start> /to <end>
     ___________________________________
     ___________________________________
     OOPS! Missing index!
@@ -26,16 +26,25 @@
     ___________________________________
     Got it. I've added this task:
     [T][ ] read book
-    Now you have 1 tasks in the list
+    Now you have 1 task in the list
+    ___________________________________
+    ___________________________________
+    OOPS! Invalid date format!
     ___________________________________
     ___________________________________
     Got it. I've added this task:
-    [D][ ] return book (by: June 6th)
+    [D][ ] return book (by: Jan 1 2026, 12:00am)
     Now you have 2 tasks in the list
     ___________________________________
     ___________________________________
+    OOPS! Invalid date format!
+    ___________________________________
+    ___________________________________
+    OOPS! End date/time must not be before start date/time!
+    ___________________________________
+    ___________________________________
     Got it. I've added this task:
-    [E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    [E][ ] project meeting (from: Aug 6 2026, 2:00pm to: Aug 6 2026, 4:00pm)
     Now you have 3 tasks in the list
     ___________________________________
     ___________________________________
@@ -51,32 +60,32 @@
     ___________________________________
     Here are the tasks in your list:
     1.[T][ ] read book
-    2.[D][ ] return book (by: June 6th)
-    3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    2.[D][ ] return book (by: Jan 1 2026, 12:00am)
+    3.[E][ ] project meeting (from: Aug 6 2026, 2:00pm to: Aug 6 2026, 4:00pm)
     4.[T][ ] join sports club
     5.[T][ ] borrow book
     ___________________________________
     ___________________________________
     Nice! I've marked this task as done:
-    [D][X] return book (by: June 6th)
+    [D][X] return book (by: Jan 1 2026, 12:00am)
     ___________________________________
     ___________________________________
     Here are the tasks in your list:
     1.[T][ ] read book
-    2.[D][X] return book (by: June 6th)
-    3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    2.[D][X] return book (by: Jan 1 2026, 12:00am)
+    3.[E][ ] project meeting (from: Aug 6 2026, 2:00pm to: Aug 6 2026, 4:00pm)
     4.[T][ ] join sports club
     5.[T][ ] borrow book
     ___________________________________
     ___________________________________
     OK, I've marked this task as not done yet:
-    [D][ ] return book (by: June 6th)
+    [D][ ] return book (by: Jan 1 2026, 12:00am)
     ___________________________________
     ___________________________________
     Here are the tasks in your list:
     1.[T][ ] read book
-    2.[D][ ] return book (by: June 6th)
-    3.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    2.[D][ ] return book (by: Jan 1 2026, 12:00am)
+    3.[E][ ] project meeting (from: Aug 6 2026, 2:00pm to: Aug 6 2026, 4:00pm)
     4.[T][ ] join sports club
     5.[T][ ] borrow book
     ___________________________________
@@ -87,8 +96,8 @@
     ___________________________________
     ___________________________________
     Here are the tasks in your list:
-    1.[D][ ] return book (by: June 6th)
-    2.[E][ ] project meeting (from: Aug 6th 2pm to: 4pm)
+    1.[D][ ] return book (by: Jan 1 2026, 12:00am)
+    2.[E][ ] project meeting (from: Aug 6 2026, 2:00pm to: Aug 6 2026, 4:00pm)
     3.[T][ ] join sports club
     4.[T][ ] borrow book
     ___________________________________
