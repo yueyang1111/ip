@@ -1,6 +1,6 @@
 # Edith User Guide
 
-Edith is a command line chatbot to help users manage their task efficiently.
+Edith is a Command-line chatbot to help users manage their task efficiently.
 It helps keeping track of Todo, Deadline and Event tasks and supports persistent storage,
 where the tasks are automatically saved and loaded when the user starts the program.
 
